@@ -15,6 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/txt_new_device_local_name"/>
+
     <TextView
         android:layout_marginTop="@dimen/default_gap"
         android:layout_width="match_parent"
@@ -24,6 +25,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/txt_new_device_remote_name"/>
+
+    <TextView
+        android:layout_marginTop="@dimen/default_gap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/new_device_remote_address"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_new_device_remote_address"/>
+
     <TextView
         android:layout_marginTop="@dimen/default_gap"
         android:layout_width="match_parent"
@@ -34,6 +46,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/txt_new_device_frequency"
         android:inputType="number"/>
+
     <Button
         android:layout_marginTop="@dimen/default_gap"
         android:layout_width="wrap_content"

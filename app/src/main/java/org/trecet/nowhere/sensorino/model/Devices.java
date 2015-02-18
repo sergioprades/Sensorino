@@ -10,9 +10,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
-/**
- * Created by pablof on 14/02/15.
- */
+
 public class Devices {
 
     private static Devices singleton = null;

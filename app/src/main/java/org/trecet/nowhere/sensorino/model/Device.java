@@ -2,13 +2,11 @@ package org.trecet.nowhere.sensorino.model;
 
 import java.io.Serializable;
 
-/**
- * Created by pablof on 13/02/15.
- */
 public class Device implements Serializable{
 
     private String local_name;
     private String remote_name;
+    private String remote_address;
     private int frequency;
 
     public String getLocal_name() {
@@ -34,4 +32,8 @@ public class Device implements Serializable{
     public void setFrequency(int frequency) {
         this.frequency = frequency;
     }
+
+    public String getRemote_address() { return remote_address; }
+
+    public void setRemote_address(String remote_address) { this.remote_address = remote_address; }
 }

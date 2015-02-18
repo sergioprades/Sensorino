@@ -14,6 +14,7 @@
 
     <string name="new_device_local_name">Local Name</string>
     <string name="new_device_remote_name">Remote Name</string>
+    <string name="new_device_remote_address">Remote Address</string>
     <string name="new_device_frequency">Frequency (hours)</string>
     <string name="new_device_create">Create</string>
     <string name="toast_new_device_created">New device created</string>
