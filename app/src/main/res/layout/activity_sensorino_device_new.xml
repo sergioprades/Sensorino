@@ -1,0 +1,45 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    tools:context=".NewDeviceActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/new_device_local_name"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_new_device_local_name"/>
+    <TextView
+        android:layout_marginTop="@dimen/default_gap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/new_device_remote_name"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_new_device_remote_name"/>
+    <TextView
+        android:layout_marginTop="@dimen/default_gap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/new_device_frequency"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_new_device_frequency"
+        android:inputType="number"/>
+    <Button
+        android:layout_marginTop="@dimen/default_gap"
+        android:layout_width="wrap_content"
+        android:layout_gravity="right"
+        android:layout_height="wrap_content"
+        android:text="@string/new_device_create"
+        android:id="@+id/but_new_device_create"/>
+
+</LinearLayout>
