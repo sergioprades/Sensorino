@@ -56,14 +56,13 @@ public class ViewDeviceActivity extends Activity {
         if(bt.isBluetoothAvailable()) {
             // Do something if bluetooth is already enable
             Log.i("Sensorino", "Starting BT service");
-            bt.setupService();
-            bt.startService(BluetoothState.DEVICE_OTHER);
 
+            // Set up listeners before setting up the service
             bt.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener() {
                 public void onDeviceConnected(String name, String address) {
                     // Do something when successfully connected
                     Toast.makeText(ViewDeviceActivity.this, "Bluetooth connection succeeded", Toast.LENGTH_SHORT).show();
-                    bt.send("temp,",false);
+                    bt.send("info",true);
                 }
 
                 public void onDeviceDisconnected() {
@@ -84,6 +83,10 @@ public class ViewDeviceActivity extends Activity {
                     t.append(message);
                 }
             });
+
+            // Start the BT Service
+            bt.setupService();
+            bt.startService(BluetoothState.DEVICE_OTHER);
 
             Log.i("Sensorino", "Connecting to " + device.getRemote_address());
             bt.connect(device.getRemote_address());
