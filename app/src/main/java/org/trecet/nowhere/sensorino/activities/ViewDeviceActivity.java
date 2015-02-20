@@ -63,7 +63,7 @@ public class ViewDeviceActivity extends Activity {
                 public void onDeviceConnected(String name, String address) {
                     // Do something when successfully connected
                     Toast.makeText(ViewDeviceActivity.this, "Bluetooth connection succeeded", Toast.LENGTH_SHORT).show();
-                    bt.send("Hi!",true);
+                    bt.send("temp,",false);
                 }
 
                 public void onDeviceDisconnected() {
