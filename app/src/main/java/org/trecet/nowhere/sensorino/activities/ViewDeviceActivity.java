@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.trecet.nowhere.sensorino.R;
 import org.trecet.nowhere.sensorino.model.Command;
 import org.trecet.nowhere.sensorino.model.Device;
@@ -57,13 +59,8 @@ public class ViewDeviceActivity extends Activity {
     @Override
     public void onStart() {
         super.onStart();
-        if(bt.isBluetoothAvailable()) {
+        if(bt.isBluetoothEnabled() && bt.isBluetoothAvailable()) {
             // Do something if bluetooth is already enable
-            Log.i("Sensorino", "Starting BT service");
-
-            // Start the BT Service
-            bt.setupService();
-            bt.startService(BluetoothState.DEVICE_OTHER);
 
             // Set up listeners before setting up the service
             bt.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener() {
@@ -101,17 +98,29 @@ public class ViewDeviceActivity extends Activity {
                     // Do something when data incoming
                     Log.i("Sensorino", "Received bytes: "+data.length);
                     TextView t = (TextView)findViewById(R.id.txt_viewDevice);
-                    t.append(message + "\n");
+//                    t.append(message + "\n");
 //                    Response response = new Response("message");
 //                    if (response.getType() == "response_info") {
-//                        t.append("Response from device recognized\n");
-//                    } else {
-//                        t.append("Response from device not recognized\n");
+//                        Toast.makeText(ViewDeviceActivity.this, "Device recogniced",
+//                                Toast.LENGTH_SHORT).show();
+                        try {
+                            JSONObject json_response = new JSONObject(message);
+                            device.setProcessor(json_response.getJSONObject("device_info").
+                                    getString("processor"));
+                        } catch (JSONException e) {
+                            Log.e("Sensorino", "Invalid JSON string: " + message, e);
+                        }
+//                      } else {
+//                        Toast.makeText(ViewDeviceActivity.this, "Device not recognized",
+//                                Toast.LENGTH_SHORT).show();
 //                    }
-
                 }
             });
 
+            // Start the BT Service
+            Log.i("Sensorino", "Starting BT service");
+            bt.setupService();
+            bt.startService(BluetoothState.DEVICE_OTHER);
 
             Log.i("Sensorino", "Connecting to " + device.getRemote_address());
             bt.connect(device.getRemote_address());
@@ -140,7 +149,8 @@ public class ViewDeviceActivity extends Activity {
                 "Local name: " + device.getLocal_name() + "\n" +
                 "Remote name: " + device.getRemote_name() + "\n" +
                 "Remote address: " + device.getRemote_address() + "\n" +
-                "Frequency: " + device.getFrequency() + "\n"
+                "Frequency: " + device.getFrequency() + "\n" +
+                "Processor: " + device.getProcessor() + "\n"
 
         );
 

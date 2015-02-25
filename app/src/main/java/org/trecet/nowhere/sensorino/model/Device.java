@@ -7,6 +7,7 @@ public class Device implements Serializable{
     private String local_name;
     private String remote_name;
     private String remote_address;
+    private String processor;
     private int frequency;
 
     public String getLocal_name() {
@@ -36,4 +37,12 @@ public class Device implements Serializable{
     public String getRemote_address() { return remote_address; }
 
     public void setRemote_address(String remote_address) { this.remote_address = remote_address; }
+
+    public String getProcessor() {
+        return processor;
+    }
+
+    public void setProcessor(String processor) {
+        this.processor = processor;
+    }
 }
