@@ -8,4 +8,10 @@ package org.trecet.nowhere.sensorino.message;
 public enum MessageType {
     GET_SENSOR_DATA,
     SENSOR_DATA,
+    ;
+
+    @Override
+    public String toString() {
+        return super.toString().toLowerCase();
+    }
 }
