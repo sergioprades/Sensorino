@@ -5,7 +5,7 @@ package org.trecet.nowhere.sensorino.message;
  */
 
 
-public class MessageType {
-    public static final int GET_SENSOR_DATA = 0;
-    public static final int SENSOR_DATA = 1;
+public enum MessageType {
+    GET_SENSOR_DATA,
+    SENSOR_DATA,
 }

@@ -7,6 +7,7 @@
     <string name="action_new_device">New Device</string>
     <string name="action_edit">Edit</string>
     <string name="action_remove">Remove</string>
+    <string name="action_get_sensor_data">Get sensor data</string>
 
     <string name="title_activity_arduino_list">Sensorino</string>
     <string name="title_activity_new_device">New Activity</string>

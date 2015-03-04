@@ -8,5 +8,7 @@
         android:orderInCategory="100" android:showAsAction="never" />
     <item android:id="@+id/action_remove_device" android:title="@string/action_remove"
         android:orderInCategory="100" android:showAsAction="never" />
+    <item android:id="@+id/action_get_sensor_data" android:title="@string/action_get_sensor_data"
+        android:orderInCategory="100" android:showAsAction="never" />
 
 </menu>

@@ -28,13 +28,15 @@ public class RemoteDevice {
         bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
             public void onDataReceived(byte[] data, String msg_receive) {
                 // Do something when data incoming
-                Log.i("Sensorino", "Received bytes: " + data.length);
+                Log.d("Sensorino", "Received: " + msg_receive);
                 MessageSensorData message = gson.fromJson(msg_receive, MessageSensorData.class);
-                Log.i("Sensorino", "First data: "+message.getSensordata().get(1));
+                Log.i("Sensorino", "First data: "+ message.getData().get("sensor_1"));
 
             }
         });
 
-        bt.send(gson.toJson(msg_send),false);
+        String msg_send_string = gson.toJson(msg_send);
+        Log.d("Sensorino", "Sent: " + msg_send_string);
+        bt.send(msg_send_string,false);
     }
 }

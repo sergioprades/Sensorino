@@ -19,6 +19,7 @@ import org.trecet.nowhere.sensorino.R;
 import org.trecet.nowhere.sensorino.model.Command;
 import org.trecet.nowhere.sensorino.model.Device;
 import org.trecet.nowhere.sensorino.model.Devices;
+import org.trecet.nowhere.sensorino.model.RemoteDevice;
 import org.trecet.nowhere.sensorino.model.Response;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
@@ -96,20 +97,20 @@ public class ViewDeviceActivity extends Activity {
             bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
                 public void onDataReceived(byte[] data, String message) {
                     // Do something when data incoming
-                    Log.i("Sensorino", "Received bytes: "+data.length);
-                    TextView t = (TextView)findViewById(R.id.txt_viewDevice);
+                    Log.i("Sensorino", "Received bytes: " + data.length);
+                    TextView t = (TextView) findViewById(R.id.txt_viewDevice);
 //                    t.append(message + "\n");
 //                    Response response = new Response("message");
 //                    if (response.getType() == "response_info") {
 //                        Toast.makeText(ViewDeviceActivity.this, "Device recogniced",
 //                                Toast.LENGTH_SHORT).show();
-                        try {
-                            JSONObject json_response = new JSONObject(message);
-                            device.setProcessor(json_response.getJSONObject("device_info").
-                                    getString("processor"));
-                        } catch (JSONException e) {
-                            Log.e("Sensorino", "Invalid JSON string: " + message, e);
-                        }
+                    try {
+                        JSONObject json_response = new JSONObject(message);
+                        device.setProcessor(json_response.getJSONObject("device_info").
+                                getString("processor"));
+                    } catch (JSONException e) {
+                        Log.e("Sensorino", "Invalid JSON string: " + message, e);
+                    }
 //                      } else {
 //                        Toast.makeText(ViewDeviceActivity.this, "Device not recognized",
 //                                Toast.LENGTH_SHORT).show();
@@ -198,6 +199,12 @@ public class ViewDeviceActivity extends Activity {
                     .setNegativeButton("No", null)
                     .show();
             return true;
+        }
+
+        if (id == R.id.action_get_sensor_data) {
+            RemoteDevice remoteDevice = new RemoteDevice(device,bt);
+            remoteDevice.getSensorData();
+
         }
 
         return super.onOptionsItemSelected(item);
