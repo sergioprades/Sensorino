@@ -11,16 +11,12 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.trecet.nowhere.sensorino.R;
-import org.trecet.nowhere.sensorino.model.Command;
 import org.trecet.nowhere.sensorino.model.Device;
 import org.trecet.nowhere.sensorino.model.Devices;
 import org.trecet.nowhere.sensorino.model.RemoteDevice;
-import org.trecet.nowhere.sensorino.model.Response;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
@@ -28,10 +24,10 @@ import app.akexorcist.bluetotohspp.library.BluetoothState;
 
 public class ViewDeviceActivity extends Activity {
     Device device;
+    RemoteDevice remoteDevice;
     Devices devices;
     int deviceID;
 
-    BluetoothSPP bt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,10 +38,9 @@ public class ViewDeviceActivity extends Activity {
         devices = Devices.getInstance(this);
         deviceID = getIntent().getIntExtra("DeviceID",-1);
         device = devices.getDeviceByPosition(deviceID);
+        remoteDevice = new RemoteDevice(device,this);
         //device = (Device)getIntent().getSerializableExtra("Device");
 
-        // Get the BT handler
-        bt = new BluetoothSPP(this);
     }
 
 
@@ -60,40 +55,13 @@ public class ViewDeviceActivity extends Activity {
     @Override
     public void onStart() {
         super.onStart();
-        if(bt.isBluetoothEnabled() && bt.isBluetoothAvailable()) {
-            // Do something if bluetooth is already enable
 
-            // Set up listeners before setting up the service
-            bt.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener() {
-                public void onDeviceConnected(String name, String address) {
-                    // Do something when successfully connected
-                    Toast.makeText(ViewDeviceActivity.this, "Bluetooth connection succeeded",
-                            Toast.LENGTH_SHORT).show();
+        remoteDevice.connect();
+        remoteDevice.getDeviceInfo();
 
-                    Command command = new Command("info");
-                    bt.send(command.getSerial(),false);
+        drawContent();
 
-                    // Send { "type": "command", "command":"info"}
-
-                    // Expected receive:
-                    // {"type":"response_info","device_info":{"model":"Arduino Pro Mini",
-                    //   "processor":"Atmega328P-AU","uptime_s":15},"sensors":{
-                    //   "sensor_1":"temperature_C","sensor_2":"humidity_%"}}
-
-                }
-
-                public void onDeviceDisconnected() {
-                    // Do something when connection was disconnected
-                    Toast.makeText(ViewDeviceActivity.this, "Bluetooth device disconnected",
-                            Toast.LENGTH_SHORT).show();
-                }
-
-                public void onDeviceConnectionFailed() {
-                    // Do something when connection failed
-                    Toast.makeText(ViewDeviceActivity.this, "Bluetooth connection failed",
-                            Toast.LENGTH_SHORT).show();
-                }
-            });
+        /*
             bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
                 public void onDataReceived(byte[] data, String message) {
                     // Do something when data incoming
@@ -117,17 +85,7 @@ public class ViewDeviceActivity extends Activity {
 //                    }
                 }
             });
-
-            // Start the BT Service
-            Log.i("Sensorino", "Starting BT service");
-            bt.setupService();
-            bt.startService(BluetoothState.DEVICE_OTHER);
-
-            Log.i("Sensorino", "Connecting to " + device.getRemote_address());
-            bt.connect(device.getRemote_address());
-        } else {
-            Toast.makeText(this, "Bluetooth adapter is not available", Toast.LENGTH_SHORT).show();
-        }
+        */
     }
 
 
@@ -135,28 +93,32 @@ public class ViewDeviceActivity extends Activity {
     public void onStop(){
         super.onStop();
 
-        //Stop BT Service
-        bt.stopService();
-
+        // Disconnect from device
+        remoteDevice.disconnect();
     }
     @Override
     public void onResume() {
         super.onResume();
 
         setTitle("Device: " + device.getLocal_name());
+        drawContent();
 
+    }
+
+    private void drawContent(){
         TextView t = (TextView)findViewById(R.id.txt_viewDevice);
         t.setText(
                 "Local name: " + device.getLocal_name() + "\n" +
-                "Remote name: " + device.getRemote_name() + "\n" +
-                "Remote address: " + device.getRemote_address() + "\n" +
-                "Frequency: " + device.getFrequency() + "\n" +
-                "Processor: " + device.getProcessor() + "\n"
+                        "Remote name: " + device.getRemote_name() + "\n" +
+                        "Remote address: " + device.getRemote_address() + "\n" +
+                        "Frequency: " + device.getFrequency() + "\n" +
+                        "Processor: " + device.getProcessor() + "\n" +
+                        "Uptime: " + remoteDevice.getUptime() + "\n"
+
 
         );
 
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -202,7 +164,6 @@ public class ViewDeviceActivity extends Activity {
         }
 
         if (id == R.id.action_get_sensor_data) {
-            RemoteDevice remoteDevice = new RemoteDevice(device,bt);
             remoteDevice.getSensorData();
 
         }

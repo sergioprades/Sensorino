@@ -6,6 +6,10 @@ package org.trecet.nowhere.sensorino.message;
 
 
 public enum MessageType {
+    GET_DEVICE_INFO,
+    DEVICE_INFO,
+    GET_SENSOR_INFO,
+    SENSOR_INFO,
     GET_SENSOR_DATA,
     SENSOR_DATA,
     ;
