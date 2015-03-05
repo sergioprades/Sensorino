@@ -56,10 +56,27 @@ public class ViewDeviceActivity extends Activity {
     public void onStart() {
         super.onStart();
 
-        remoteDevice.connect();
-        remoteDevice.getDeviceInfo();
+        // This should take care of everything
+        remoteDevice.connect(new RemoteDevice.Connection() {
+            @Override
+            public void onConnected() {
+                remoteDevice.getDeviceInfo(new RemoteDevice.Command() {
+                    @Override
+                    public void onSuccess() {
+                        drawContent();
+                    }
 
-        drawContent();
+                    @Override
+                    public void onFailure() {
+                    }
+                });
+
+            }
+
+            @Override
+            public void onDisconnected() {
+            }
+        });
 
         /*
             bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
@@ -87,7 +104,6 @@ public class ViewDeviceActivity extends Activity {
             });
         */
     }
-
 
     @Override
     public void onStop(){

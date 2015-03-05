@@ -4,13 +4,17 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.android.internal.util.Predicate;
 import com.google.gson.Gson;
 
 import org.trecet.nowhere.sensorino.message.MessageDeviceInfo;
+import org.trecet.nowhere.sensorino.message.MessageGetDeviceInfo;
 import org.trecet.nowhere.sensorino.message.MessageGetSensorData;
 import org.trecet.nowhere.sensorino.message.MessageGetSensorInfo;
 import org.trecet.nowhere.sensorino.message.MessageSensorData;
 import org.trecet.nowhere.sensorino.message.MessageSensorInfo;
+
+import java.util.concurrent.Callable;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
@@ -33,11 +37,21 @@ public class RemoteDevice {
         this.context = context;
     }
 
+    public interface Command {
+        public void onSuccess();
+        public void onFailure();
+    }
+
+    public interface Connection {
+        public void onConnected();
+        public void onDisconnected();
+    }
+
     public void disconnect() {
         bt.stopService();
 
     }
-    public void connect() {
+    public void connect(final Connection connection) {
         bt = new BluetoothSPP(context);
         if (bt.isBluetoothEnabled() && bt.isBluetoothAvailable()) {
             // Do something if bluetooth is already enable
@@ -49,6 +63,8 @@ public class RemoteDevice {
                     Toast.makeText(context, "Bluetooth connection succeeded",
                             Toast.LENGTH_SHORT).show();
 
+                    // Callback to make progeess
+                    connection.onConnected();
 //                    Command command = new Command("info");
 //                    bt.send(command.getSerial(),false);
 
@@ -59,12 +75,15 @@ public class RemoteDevice {
                     // Do something when connection was disconnected
                     Toast.makeText(context, "Bluetooth device disconnected",
                             Toast.LENGTH_SHORT).show();
+
+                    connection.onDisconnected();
                 }
 
                 public void onDeviceConnectionFailed() {
                     // Do something when connection failed
                     Toast.makeText(context, "Bluetooth connection failed",
                             Toast.LENGTH_SHORT).show();
+                    connection.onDisconnected();
                 }
             });
 
@@ -77,6 +96,7 @@ public class RemoteDevice {
             bt.connect(device.getRemote_address());
         } else {
             Toast.makeText(context, "Bluetooth adapter is not available", Toast.LENGTH_SHORT).show();
+            connection.onDisconnected();
         }
 
     }
@@ -118,7 +138,7 @@ public class RemoteDevice {
         bt.send(msg_send_string,false);
     }
 
-    public void getDeviceInfo() {
+    public void getDeviceInfo(final Command command) {
         // Send { "type": "get_device_info" }
 
         // Expected receive:
@@ -126,7 +146,7 @@ public class RemoteDevice {
         //   "processor":"Atmega328P-AU","uptime_s":15},
         //
 
-        MessageGetSensorInfo msg_send = new MessageGetSensorInfo();
+        MessageGetDeviceInfo msg_send = new MessageGetDeviceInfo();
         bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
             public void onDataReceived(byte[] data, String msg_receive) {
                 // Do something when data incoming
@@ -134,12 +154,14 @@ public class RemoteDevice {
                 MessageDeviceInfo message = gson.fromJson(msg_receive, MessageDeviceInfo.class);
 
                 RemoteDevice.this.uptime = Integer.parseInt(message.getData().get("uptime_s"));
+
+                command.onSuccess();
             }
         });
 
         String msg_send_string = gson.toJson(msg_send);
         Log.d("Sensorino", "Sent: " + msg_send_string);
-        bt.send(msg_send_string,false);
+        bt.send(msg_send_string + "\n",false);
     }
 
     public int getUptime() {
