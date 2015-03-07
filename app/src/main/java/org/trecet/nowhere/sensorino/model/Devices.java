@@ -42,7 +42,7 @@ public class Devices {
 
     }
 
-    private boolean persist (){
+    public boolean persist (){
         //Set the values
         //Gson gson = new Gson();
         //List<String> textList = new ArrayList<String>();

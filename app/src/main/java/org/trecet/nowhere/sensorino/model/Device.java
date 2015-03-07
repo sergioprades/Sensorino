@@ -1,14 +1,20 @@
 package org.trecet.nowhere.sensorino.model;
 
-import java.io.Serializable;
+import android.content.Context;
 
-public class Device implements Serializable{
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
+
+public class Device {
 
     private String local_name;
     private String remote_name;
     private String remote_address;
     private String processor;
     private int frequency;
+    private HashMap<String,Sensor> sensors;
 
     public String getLocal_name() {
         return local_name;
@@ -45,4 +51,25 @@ public class Device implements Serializable{
     public void setProcessor(String processor) {
         this.processor = processor;
     }
+
+    // Persistence (provided by Devices
+    public void persist(Context context){
+        Devices devices = Devices.getInstance(context);
+        devices.persist();
+    }
+
+    // Sensor stuff
+    public Set<String> getSensorNames() {
+        return sensors.keySet();
+    }
+
+    public Sensor getSensor(String name) {
+        return sensors.get(name);
+    }
+
+    public void setSensor(String name, Sensor sensor) {
+        this.sensors.put(name, sensor);
+    }
+
+
 }

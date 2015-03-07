@@ -14,6 +14,7 @@ import org.trecet.nowhere.sensorino.message.MessageGetSensorInfo;
 import org.trecet.nowhere.sensorino.message.MessageSensorData;
 import org.trecet.nowhere.sensorino.message.MessageSensorInfo;
 
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
@@ -101,15 +102,27 @@ public class RemoteDevice {
 
     }
 
-    public void getSensorData() {
+    public void getSensorData(final Command command) {
         MessageGetSensorData msg_send = new MessageGetSensorData();
         bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
             public void onDataReceived(byte[] data, String msg_receive) {
                 // Do something when data incoming
                 Log.d("Sensorino", "Received: " + msg_receive);
+                // TODO check message is of the right type (exception?)
                 MessageSensorData message = gson.fromJson(msg_receive, MessageSensorData.class);
-                Log.i("Sensorino", "First data: "+ message.getData().get("sensor_1"));
+                Log.i("Sensorino", "Received data: "+ message.getData().toString());
 
+                // TODO Separate this... we may not want to insert it into the historical data
+                for (String name: message.getSensorNames()) {
+                    //TODO need to check the sensor actually exists
+                    SensorData sensorData = new SensorData((int) (System.currentTimeMillis()/1000L),
+                            message.getSensorValue(name));
+                    device.getSensor(name).addSensorData(sensorData);
+                }
+                device.persist(context);
+
+                // And finally call the callback before ending
+                command.onSuccess();
             }
         });
 
@@ -118,18 +131,31 @@ public class RemoteDevice {
         bt.send(msg_send_string,false);
     }
 
-    public void getSensorInfo() {
+    public void getSensorInfo(final Command command) {
         // Send { "type": "get_sensor_info" }
 
         // Expected receive:
-        // {"type":"sensor_info","data":{"sensor_1":"temperature_C","sensor_2":"humidity_%"}}
+        // {"type":"sensor_info","data":{"sensor_1":"temperature_C","sensor_2":"humidity_p100"}}
         MessageGetSensorInfo msg_send = new MessageGetSensorInfo();
         bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
             public void onDataReceived(byte[] data, String msg_receive) {
                 // Do something when data incoming
                 Log.d("Sensorino", "Received: " + msg_receive);
+                //TODO check message is of the right type (exception?)
                 MessageSensorInfo message = gson.fromJson(msg_receive, MessageSensorInfo.class);
 
+                for (String name: message.getSensorNames()) {
+                    if (! device.getSensorNames().contains(name)) {
+                        // Create a new sensor
+                        Log.i ("Sensorino", "Found new device "+name);
+                        Sensor sensor = new Sensor(name, message.getSensorType(name));
+                        device.setSensor(name, sensor);
+                        device.persist(context);
+
+                    }
+                    // TODO check if the device existed but with a different type
+                }
+                command.onSuccess();
             }
         });
 
@@ -151,8 +177,9 @@ public class RemoteDevice {
             public void onDataReceived(byte[] data, String msg_receive) {
                 // Do something when data incoming
                 Log.d("Sensorino", "Received: " + msg_receive);
+                // TODO check message is of the right type (exception?)
                 MessageDeviceInfo message = gson.fromJson(msg_receive, MessageDeviceInfo.class);
-
+                // TODO make the getData private here as well if possible (like MessageSensorInfo)
                 RemoteDevice.this.uptime = Integer.parseInt(message.getData().get("uptime_s"));
 
                 command.onSuccess();

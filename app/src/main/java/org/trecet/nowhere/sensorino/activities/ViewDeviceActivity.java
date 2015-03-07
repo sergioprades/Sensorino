@@ -17,6 +17,10 @@ import org.trecet.nowhere.sensorino.R;
 import org.trecet.nowhere.sensorino.model.Device;
 import org.trecet.nowhere.sensorino.model.Devices;
 import org.trecet.nowhere.sensorino.model.RemoteDevice;
+import org.trecet.nowhere.sensorino.model.Sensor;
+import org.trecet.nowhere.sensorino.model.SensorData;
+
+import java.util.ArrayList;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
@@ -130,10 +134,13 @@ public class ViewDeviceActivity extends Activity {
                         "Frequency: " + device.getFrequency() + "\n" +
                         "Processor: " + device.getProcessor() + "\n" +
                         "Uptime: " + remoteDevice.getUptime() + "\n"
-
-
         );
-
+        for (String sensorname: device.getSensorNames()) {
+            t.append("Sensor "+sensorname+": \n");
+            for (SensorData sensorData: device.getSensor(sensorname).getData()){
+                t.append("   "+sensorData.getTimestamp()+": "+sensorData.getValue()+"\n");
+            }
+        }
     }
 
     @Override
@@ -180,8 +187,16 @@ public class ViewDeviceActivity extends Activity {
         }
 
         if (id == R.id.action_get_sensor_data) {
-            remoteDevice.getSensorData();
+            remoteDevice.getSensorData(new RemoteDevice.Command() {
+                @Override
+                public void onSuccess() {
+                    drawContent();
+                }
 
+                @Override
+                public void onFailure() {
+                }
+            });
         }
 
         return super.onOptionsItemSelected(item);
