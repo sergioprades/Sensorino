@@ -16,6 +16,15 @@ public class Device {
     private int frequency;
     private HashMap<String,Sensor> sensors;
 
+    public Device() {
+        this.remote_address = "";
+        this.processor = "";
+        this.frequency = 0;
+        this.sensors = new HashMap<>();
+        this.remote_name = "";
+        this.local_name = "NULL";
+    }
+
     public String getLocal_name() {
         return local_name;
     }

@@ -53,11 +53,21 @@ public class RemoteDevice {
 
     }
     public void connect(final Connection connection) {
+        // TODO When we connect, we probably should empty the receive queue (in case something was queued before)
         bt = new BluetoothSPP(context);
+
         if (bt.isBluetoothEnabled() && bt.isBluetoothAvailable()) {
             // Do something if bluetooth is already enable
 
-            // Set up listeners before setting up the service
+            // This is not working...
+//            // Wipe the receive buffer
+//            bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
+//                public void onDataReceived(byte[] data, String msg_receive) {
+//                }
+//            });
+
+
+                    // Set up listeners before setting up the service
             bt.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener() {
                 public void onDeviceConnected(String name, String address) {
                     // Do something when successfully connected

@@ -67,7 +67,18 @@ public class ViewDeviceActivity extends Activity {
                 remoteDevice.getDeviceInfo(new RemoteDevice.Command() {
                     @Override
                     public void onSuccess() {
-                        drawContent();
+                        remoteDevice.getSensorInfo(new RemoteDevice.Command(){
+                            @Override
+                            public void onSuccess() {
+                                drawContent();
+                            }
+
+                            @Override
+                            public void onFailure() {
+                            }
+
+
+                        });
                     }
 
                     @Override
@@ -198,6 +209,7 @@ public class ViewDeviceActivity extends Activity {
                 }
             });
         }
+
 
         return super.onOptionsItemSelected(item);
     }
