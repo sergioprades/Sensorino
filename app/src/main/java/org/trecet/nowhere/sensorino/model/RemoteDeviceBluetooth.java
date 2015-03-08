@@ -4,6 +4,9 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
 
@@ -23,8 +26,10 @@ public class RemoteDeviceBluetooth extends RemoteDevice {
         // TODO When we connect, we probably should empty the receive queue (in case something was queued before)
         bt = new BluetoothSPP(context);
 
-        // TODO Need to check if BT address is legitimate, otherwise it crashes.
-        if (bt.isBluetoothEnabled() && bt.isBluetoothAvailable()) {
+        // Need to check if BT address is legitimate, otherwise it crashes.
+        Pattern p = Pattern.compile("..:..:..:..:..:..");
+        Matcher m = p.matcher(device.getRemote_address());
+        if (m.matches() && bt.isBluetoothEnabled() && bt.isBluetoothAvailable()) {
             // Do something if bluetooth is already enable
 
             // This is not working...
