@@ -15,12 +15,11 @@ import java.util.Random;
  */
 public class RemoteDeviceDummy extends RemoteDevice {
 
-    MessageType lastMessage = null;
+    MessageType lastMessage;
 
     public RemoteDeviceDummy(Device device, Context context) {
         super(device,context);
     }
-
 
     public void connect(final Connection connection) {
         Log.i("Sensorino", "Connecting to Dummy Device");
@@ -43,12 +42,10 @@ public class RemoteDeviceDummy extends RemoteDevice {
     }
 
     public void onDataReceived(final Reception reception){
-
         // TODO check this... I don't even know how it works!
         // (a normal thread thows an exception when updating the UI
         Handler mainHandler = new Handler(context.getMainLooper());
         mainHandler.post(new Thread(new Runnable() {
-
             @Override
             public void run() {
                 // This is the delay
@@ -59,6 +56,7 @@ public class RemoteDeviceDummy extends RemoteDevice {
                     e.printStackTrace();
                 }
                 // This will run on a background thread
+                // TODO we should create the right message types, not the string
                 switch (lastMessage) {
                     case GET_DEVICE_INFO:
                         // {"type":"device_info","data":{"model":"Arduino Pro Mini",
@@ -79,7 +77,6 @@ public class RemoteDeviceDummy extends RemoteDevice {
                     default:
                         break;
                 }
-
             }
         }));
     }

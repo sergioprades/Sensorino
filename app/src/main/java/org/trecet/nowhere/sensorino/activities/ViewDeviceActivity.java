@@ -51,9 +51,10 @@ public class ViewDeviceActivity extends Activity {
             case DUMMY:
                 remoteDevice = new RemoteDeviceDummy(device,this);
                 break;
+            default:
+                finish();
+                Toast.makeText(this, getString(R.string.toast_device_unknown_type), Toast.LENGTH_SHORT).show();
         }
-        //device = (Device)getIntent().getSerializableExtra("Device");
-
     }
 
 
@@ -69,6 +70,7 @@ public class ViewDeviceActivity extends Activity {
     public void onStart() {
         super.onStart();
 
+        // TODO need some error checking here (some errors are provided in the upper classes)
         // This should take care of everything
         remoteDevice.connect(new RemoteDevice.Connection() {
             @Override
@@ -85,8 +87,6 @@ public class ViewDeviceActivity extends Activity {
                             @Override
                             public void onFailure() {
                             }
-
-
                         });
                     }
 
@@ -101,32 +101,6 @@ public class ViewDeviceActivity extends Activity {
             public void onDisconnected() {
             }
         });
-
-        /*
-            bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
-                public void onDataReceived(byte[] data, String message) {
-                    // Do something when data incoming
-                    Log.i("Sensorino", "Received bytes: " + data.length);
-                    TextView t = (TextView) findViewById(R.id.txt_viewDevice);
-//                    t.append(message + "\n");
-//                    Response response = new Response("message");
-//                    if (response.getType() == "response_info") {
-//                        Toast.makeText(ViewDeviceActivity.this, "Device recogniced",
-//                                Toast.LENGTH_SHORT).show();
-                    try {
-                        JSONObject json_response = new JSONObject(message);
-                        device.setProcessor(json_response.getJSONObject("device_info").
-                                getString("processor"));
-                    } catch (JSONException e) {
-                        Log.e("Sensorino", "Invalid JSON string: " + message, e);
-                    }
-//                      } else {
-//                        Toast.makeText(ViewDeviceActivity.this, "Device not recognized",
-//                                Toast.LENGTH_SHORT).show();
-//                    }
-                }
-            });
-        */
     }
 
     @Override
@@ -156,7 +130,8 @@ public class ViewDeviceActivity extends Activity {
                         "Uptime: " + remoteDevice.getUptime() + "\n"
         );
         for (String sensorname: device.getSensorNames()) {
-            t.append("Sensor "+sensorname+": \n");
+            t.append("Sensor "+sensorname+"  ("+
+                    device.getSensor(sensorname).getType().toString().toLowerCase()+"): \n");
             for (SensorData sensorData: device.getSensor(sensorname).getData()){
                 t.append("   "+sensorData.getTimestamp()+": "+sensorData.getValue()+"\n");
             }
@@ -224,18 +199,3 @@ public class ViewDeviceActivity extends Activity {
     }
 }
 
-/*
-// Constants that indicate the current connection state
-public static final int STATE_NONE = 0;             // we're doing nothing
-public static final int STATE_LISTEN = 1;           // now listening for incoming connections
-public static final int STATE_CONNECTING = 2;       // now initiating an outgoing connection
-public static final int STATE_CONNECTED = 3;        // now connected to a remote device
-public static final int STATE_NULL = -1;            // now service is null
-
-// Message types sent from the BluetoothChatService Handler
-public static final int MESSAGE_STATE_CHANGE = 1;
-public static final int MESSAGE_READ = 2;
-public static final int MESSAGE_WRITE = 3;
-public static final int MESSAGE_DEVICE_NAME = 4;
-public static final int MESSAGE_TOAST = 5;
-*/

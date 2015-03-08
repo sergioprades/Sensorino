@@ -37,6 +37,10 @@ public abstract class RemoteDevice {
         this.context = context;
     }
 
+    public int getUptime() {
+        return uptime;
+    }
+
     public interface Command {
         public void onSuccess();
         public void onFailure();
@@ -59,8 +63,9 @@ public abstract class RemoteDevice {
 
     public abstract void onDataReceived(Reception reception);
 
-    public void getSensorData(final Command command) {
 
+    // TODO we probably need to get all the rest out of this class
+    public void getSensorData(final Command command) {
         // Expected receive:
         // {"type":"sensor_data","data":{"sensor_1":25.0,"sensor_2":45.0}}
         onDataReceived(new Reception() {
@@ -94,7 +99,6 @@ public abstract class RemoteDevice {
     }
 
     public void getSensorInfo(final Command command) {
-
         // Expected receive:
         // {"type":"sensor_info","data":{"sensor_1":"temperature_C","sensor_2":"humidity_p100"}}
         onDataReceived(new Reception() {
@@ -152,7 +156,4 @@ public abstract class RemoteDevice {
         send(msg_send_string);
     }
 
-    public int getUptime() {
-        return uptime;
-    }
 }

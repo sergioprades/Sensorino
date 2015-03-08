@@ -22,6 +22,7 @@
 
     <string name="toast_new_device_created">New device created</string>
     <string name="toast_new_device_error">Error creating device</string>
+    <string name="toast_device_unknown_type">Device type unknown</string>
     <string name="remove_device_confirmation">Are you sure you want to remove this device? All its data will be removed!</string>
     <string name="remove_device">Remove Device</string>
 
