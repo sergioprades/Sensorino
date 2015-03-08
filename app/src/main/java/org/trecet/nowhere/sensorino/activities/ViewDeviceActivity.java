@@ -1,5 +1,6 @@
 package org.trecet.nowhere.sensorino.activities;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -8,8 +9,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,6 +29,7 @@ import org.trecet.nowhere.sensorino.model.Sensor;
 import org.trecet.nowhere.sensorino.model.SensorData;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
@@ -136,6 +143,28 @@ public class ViewDeviceActivity extends Activity {
                 t.append("   "+sensorData.getTimestamp()+": "+sensorData.getValue()+"\n");
             }
         }
+
+        GraphView graph = (GraphView) findViewById(R.id.graph_view_device);
+        graph.setTitle("sensor_1  "+device.getSensor("sensor_1").getType().toString().toLowerCase());
+        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>();
+        for (SensorData sensorData: device.getSensor("sensor_1").getData()) {
+            java.util.Date time=new java.util.Date((long)sensorData.getTimestamp()*1000);
+            series.appendData(new DataPoint(time, sensorData.getValue()),true,100);
+            graph.addSeries(series);
+        }
+
+        LinearLayout linLayout = (LinearLayout) findViewById(R.id.linear_layout_view_device);
+        GraphView graph2 = new GraphView(this);
+        graph.setTitle("sensor_2  "+device.getSensor("sensor_2").getType().toString().toLowerCase());
+        LineGraphSeries<DataPoint> series2 = new LineGraphSeries<DataPoint>();
+        for (SensorData sensorData: device.getSensor("sensor_2").getData()) {
+            java.util.Date time=new java.util.Date((long)sensorData.getTimestamp()*1000);
+            series2.appendData(new DataPoint(time, sensorData.getValue()),true,100);
+            graph2.addSeries(series2);
+        }
+//        graph2.setLayoutParams(ActionBar.LayoutParams.MATCH_PARENT);
+        linLayout.addView(graph2);
+//        linLayout.addView(graph);
     }
 
     @Override
