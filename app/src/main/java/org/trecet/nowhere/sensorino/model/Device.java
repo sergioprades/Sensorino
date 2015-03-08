@@ -12,6 +12,7 @@ public class Device {
     private String local_name;
     private String remote_name;
     private String remote_address;
+    private RemoteDeviceType remote_type;
     private String processor;
     private int frequency;
     private HashMap<String,Sensor> sensors;
@@ -23,6 +24,7 @@ public class Device {
         this.sensors = new HashMap<>();
         this.remote_name = "";
         this.local_name = "NULL";
+        this.remote_type = RemoteDeviceType.BLUETOOTH; // by default TODO remove later
     }
 
     public String getLocal_name() {
@@ -52,6 +54,14 @@ public class Device {
     public String getRemote_address() { return remote_address; }
 
     public void setRemote_address(String remote_address) { this.remote_address = remote_address; }
+
+    public RemoteDeviceType getRemote_type() {
+        return remote_type;
+    }
+
+    public void setRemote_type(RemoteDeviceType remote_type) {
+        this.remote_type = remote_type;
+    }
 
     public String getProcessor() {
         return processor;

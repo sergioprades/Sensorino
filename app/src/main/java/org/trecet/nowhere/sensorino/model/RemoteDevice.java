@@ -23,13 +23,12 @@ import app.akexorcist.bluetotohspp.library.BluetoothState;
 /**
  * Created by edoras on 3/2/15.
  */
-public class RemoteDevice {
+public abstract class RemoteDevice {
 
-    private Device device;
-    private BluetoothSPP bt;
-    private Context context;
+    protected Device device;
+    protected Context context;
 
-    private Gson gson = new Gson();
+    protected Gson gson = new Gson();
 
     private int uptime;
 
@@ -48,74 +47,25 @@ public class RemoteDevice {
         public void onDisconnected();
     }
 
-    public void disconnect() {
-        bt.stopService();
-
+    public interface Reception {
+        public void onDataReceived(String message);
     }
-    public void connect(final Connection connection) {
-        // TODO When we connect, we probably should empty the receive queue (in case something was queued before)
-        bt = new BluetoothSPP(context);
 
-        if (bt.isBluetoothEnabled() && bt.isBluetoothAvailable()) {
-            // Do something if bluetooth is already enable
+    public abstract void disconnect();
 
-            // This is not working...
-//            // Wipe the receive buffer
-//            bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
-//                public void onDataReceived(byte[] data, String msg_receive) {
-//                }
-//            });
+    public abstract void connect(final Connection connection);
 
+    public abstract void send(String message);
 
-                    // Set up listeners before setting up the service
-            bt.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener() {
-                public void onDeviceConnected(String name, String address) {
-                    // Do something when successfully connected
-                    Toast.makeText(context, "Bluetooth connection succeeded",
-                            Toast.LENGTH_SHORT).show();
-
-                    // Callback to make progeess
-                    connection.onConnected();
-//                    Command command = new Command("info");
-//                    bt.send(command.getSerial(),false);
-
-
-                }
-
-                public void onDeviceDisconnected() {
-                    // Do something when connection was disconnected
-                    Toast.makeText(context, "Bluetooth device disconnected",
-                            Toast.LENGTH_SHORT).show();
-
-                    connection.onDisconnected();
-                }
-
-                public void onDeviceConnectionFailed() {
-                    // Do something when connection failed
-                    Toast.makeText(context, "Bluetooth connection failed",
-                            Toast.LENGTH_SHORT).show();
-                    connection.onDisconnected();
-                }
-            });
-
-            // Start the BT Service
-            Log.i("Sensorino", "Starting BT service");
-            bt.setupService();
-            bt.startService(BluetoothState.DEVICE_OTHER);
-
-            Log.i("Sensorino", "Connecting to " + device.getRemote_address());
-            bt.connect(device.getRemote_address());
-        } else {
-            Toast.makeText(context, "Bluetooth adapter is not available", Toast.LENGTH_SHORT).show();
-            connection.onDisconnected();
-        }
-
-    }
+    public abstract void onDataReceived(Reception reception);
 
     public void getSensorData(final Command command) {
-        MessageGetSensorData msg_send = new MessageGetSensorData();
-        bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
-            public void onDataReceived(byte[] data, String msg_receive) {
+
+        // Expected receive:
+        // {"type":"sensor_data","data":{"sensor_1":25.0,"sensor_2":45.0}}
+        onDataReceived(new Reception() {
+            @Override
+            public void onDataReceived(String msg_receive){
                 // Do something when data incoming
                 Log.d("Sensorino", "Received: " + msg_receive);
                 // TODO check message is of the right type (exception?)
@@ -136,19 +86,20 @@ public class RemoteDevice {
             }
         });
 
+        // Send { "type": "get_sensor_data" }
+        MessageGetSensorData msg_send = new MessageGetSensorData();
         String msg_send_string = gson.toJson(msg_send);
         Log.d("Sensorino", "Sent: " + msg_send_string);
-        bt.send(msg_send_string,false);
+        send(msg_send_string);
     }
 
     public void getSensorInfo(final Command command) {
-        // Send { "type": "get_sensor_info" }
 
         // Expected receive:
         // {"type":"sensor_info","data":{"sensor_1":"temperature_C","sensor_2":"humidity_p100"}}
-        MessageGetSensorInfo msg_send = new MessageGetSensorInfo();
-        bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
-            public void onDataReceived(byte[] data, String msg_receive) {
+        onDataReceived(new Reception() {
+            @Override
+            public void onDataReceived(String msg_receive){
                 // Do something when data incoming
                 Log.d("Sensorino", "Received: " + msg_receive);
                 //TODO check message is of the right type (exception?)
@@ -169,22 +120,20 @@ public class RemoteDevice {
             }
         });
 
+        // Send { "type": "get_sensor_info" }
+        MessageGetSensorInfo msg_send = new MessageGetSensorInfo();
         String msg_send_string = gson.toJson(msg_send);
         Log.d("Sensorino", "Sent: " + msg_send_string);
-        bt.send(msg_send_string,false);
+        send(msg_send_string);
     }
 
     public void getDeviceInfo(final Command command) {
-        // Send { "type": "get_device_info" }
-
         // Expected receive:
         // {"type":"device_info","data":{"model":"Arduino Pro Mini",
         //   "processor":"Atmega328P-AU","uptime_s":15},
-        //
-
-        MessageGetDeviceInfo msg_send = new MessageGetDeviceInfo();
-        bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
-            public void onDataReceived(byte[] data, String msg_receive) {
+        onDataReceived(new Reception() {
+            @Override
+            public void onDataReceived(String msg_receive){
                 // Do something when data incoming
                 Log.d("Sensorino", "Received: " + msg_receive);
                 // TODO check message is of the right type (exception?)
@@ -196,9 +145,11 @@ public class RemoteDevice {
             }
         });
 
+        // Send { "type": "get_device_info" }
+        MessageGetDeviceInfo msg_send = new MessageGetDeviceInfo();
         String msg_send_string = gson.toJson(msg_send);
         Log.d("Sensorino", "Sent: " + msg_send_string);
-        bt.send(msg_send_string + "\n",false);
+        send(msg_send_string);
     }
 
     public int getUptime() {

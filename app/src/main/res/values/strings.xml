@@ -16,8 +16,10 @@
     <string name="new_device_local_name">Local Name</string>
     <string name="new_device_remote_name">Remote Name</string>
     <string name="new_device_remote_address">Remote Address</string>
+    <string name="new_device_remote_type">Remote Type</string>
     <string name="new_device_frequency">Frequency (hours)</string>
     <string name="new_device_create">Create</string>
+
     <string name="toast_new_device_created">New device created</string>
     <string name="toast_new_device_error">Error creating device</string>
     <string name="remove_device_confirmation">Are you sure you want to remove this device? All its data will be removed!</string>

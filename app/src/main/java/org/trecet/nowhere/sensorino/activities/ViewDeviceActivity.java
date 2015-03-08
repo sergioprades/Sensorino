@@ -17,6 +17,8 @@ import org.trecet.nowhere.sensorino.R;
 import org.trecet.nowhere.sensorino.model.Device;
 import org.trecet.nowhere.sensorino.model.Devices;
 import org.trecet.nowhere.sensorino.model.RemoteDevice;
+import org.trecet.nowhere.sensorino.model.RemoteDeviceBluetooth;
+import org.trecet.nowhere.sensorino.model.RemoteDeviceDummy;
 import org.trecet.nowhere.sensorino.model.Sensor;
 import org.trecet.nowhere.sensorino.model.SensorData;
 
@@ -42,7 +44,14 @@ public class ViewDeviceActivity extends Activity {
         devices = Devices.getInstance(this);
         deviceID = getIntent().getIntExtra("DeviceID",-1);
         device = devices.getDeviceByPosition(deviceID);
-        remoteDevice = new RemoteDevice(device,this);
+        switch (device.getRemote_type()) {
+            case BLUETOOTH:
+                remoteDevice = new RemoteDeviceBluetooth(device,this);
+                break;
+            case DUMMY:
+                remoteDevice = new RemoteDeviceDummy(device,this);
+                break;
+        }
         //device = (Device)getIntent().getSerializableExtra("Device");
 
     }
