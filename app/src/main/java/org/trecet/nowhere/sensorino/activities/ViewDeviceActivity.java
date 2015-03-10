@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -144,27 +145,20 @@ public class ViewDeviceActivity extends Activity {
             }
         }
 
-        GraphView graph = (GraphView) findViewById(R.id.graph_view_device);
-        graph.setTitle("sensor_1  "+device.getSensor("sensor_1").getType().toString().toLowerCase());
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>();
-        for (SensorData sensorData: device.getSensor("sensor_1").getData()) {
-            java.util.Date time=new java.util.Date((long)sensorData.getTimestamp()*1000);
-            series.appendData(new DataPoint(time, sensorData.getValue()),true,100);
-            graph.addSeries(series);
-        }
-
+        // TODO this adds new graphs all the time, instead of replacing the old ones
         LinearLayout linLayout = (LinearLayout) findViewById(R.id.linear_layout_view_device);
-        GraphView graph2 = new GraphView(this);
-        graph.setTitle("sensor_2  "+device.getSensor("sensor_2").getType().toString().toLowerCase());
-        LineGraphSeries<DataPoint> series2 = new LineGraphSeries<DataPoint>();
-        for (SensorData sensorData: device.getSensor("sensor_2").getData()) {
-            java.util.Date time=new java.util.Date((long)sensorData.getTimestamp()*1000);
-            series2.appendData(new DataPoint(time, sensorData.getValue()),true,100);
-            graph2.addSeries(series2);
+        for (String sensorname: device.getSensorNames()) {
+            GraphView graph = new GraphView(this);
+            graph.setTitle(sensorname+"  " + device.getSensor(sensorname).getType().toString().toLowerCase());
+            LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>();
+            for (SensorData sensorData : device.getSensor(sensorname).getData()) {
+                java.util.Date time = new java.util.Date((long) sensorData.getTimestamp() * 1000);
+                series.appendData(new DataPoint(time, sensorData.getValue()), true, 100);
+                graph.addSeries(series);
+            }
+            linLayout.addView(graph, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 200));
+//            linLayout.addView(graph);
         }
-//        graph2.setLayoutParams(ActionBar.LayoutParams.MATCH_PARENT);
-        linLayout.addView(graph2);
-//        linLayout.addView(graph);
     }
 
     @Override
