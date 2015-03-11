@@ -16,7 +16,10 @@ import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.Series;
+import com.jjoe64.graphview.series.OnDataPointTapListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -128,8 +131,8 @@ public class ViewDeviceActivity extends Activity {
     }
 
     private void drawContent(){
-        TextView t = (TextView)findViewById(R.id.txt_viewDevice);
-        t.setText(
+        TextView pre = (TextView)findViewById(R.id.txt_viewDevice_pre);
+        pre.setText(
                 "Local name: " + device.getLocal_name() + "\n" +
                         "Remote name: " + device.getRemote_name() + "\n" +
                         "Remote address: " + device.getRemote_address() + "\n" +
@@ -137,27 +140,40 @@ public class ViewDeviceActivity extends Activity {
                         "Processor: " + device.getProcessor() + "\n" +
                         "Uptime: " + remoteDevice.getUptime() + "\n"
         );
-        for (String sensorname: device.getSensorNames()) {
-            t.append("Sensor "+sensorname+"  ("+
-                    device.getSensor(sensorname).getType().toString().toLowerCase()+"): \n");
-            for (SensorData sensorData: device.getSensor(sensorname).getData()){
-                t.append("   "+sensorData.getTimestamp()+": "+sensorData.getValue()+"\n");
-            }
-        }
 
-        // TODO this adds new graphs all the time, instead of replacing the old ones
-        LinearLayout linLayout = (LinearLayout) findViewById(R.id.linear_layout_view_device);
-        for (String sensorname: device.getSensorNames()) {
+        // TODO redrawing the graph all the time may not be very efficient
+        LinearLayout linLayout = (LinearLayout) findViewById(R.id.view_device_graphs);
+        linLayout.removeAllViews();
+        for (String sensorName: device.getSensorNames()) {
+            Log.i ("Sensorino", "Drawing graph "+sensorName);
             GraphView graph = new GraphView(this);
-            graph.setTitle(sensorname+"  " + device.getSensor(sensorname).getType().toString().toLowerCase());
+            graph.setTitle(sensorName+"  " + device.getSensor(sensorName).getType().toString().toLowerCase());
             LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>();
-            for (SensorData sensorData : device.getSensor(sensorname).getData()) {
+            for (SensorData sensorData : device.getSensor(sensorName).getData()) {
                 java.util.Date time = new java.util.Date((long) sensorData.getTimestamp() * 1000);
                 series.appendData(new DataPoint(time, sensorData.getValue()), true, 100);
                 graph.addSeries(series);
             }
+            /*  The Toast here is not working very well...
+            series.setOnDataPointTapListener(new OnDataPointTapListener() {
+                @Override
+                public void onTap(Series series, DataPointInterface dataPoint) {
+                    java.util.Date time = new java.util.Date((long) dataPoint.getX() * 1000);
+                    Toast.makeText(ViewDeviceActivity.this, time.toString() + dataPoint.getY(), Toast.LENGTH_SHORT).show();
+                }
+            });
+            */
             linLayout.addView(graph, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 200));
-//            linLayout.addView(graph);
+        }
+
+        TextView post = (TextView)findViewById(R.id.txt_viewDevice_post);
+        post.setText("");
+        for (String sensorName: device.getSensorNames()) {
+            post.append("Sensor " + sensorName + "  (" +
+                    device.getSensor(sensorName).getType().toString().toLowerCase() + "): \n");
+            for (SensorData sensorData: device.getSensor(sensorName).getData()){
+                post.append("   " + sensorData.getTimestamp() + ": " + sensorData.getValue() + "\n");
+            }
         }
     }
 
