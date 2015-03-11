@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.LineGraphSeries;
@@ -33,6 +34,7 @@ import org.trecet.nowhere.sensorino.model.Sensor;
 import org.trecet.nowhere.sensorino.model.SensorData;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
@@ -150,8 +152,7 @@ public class ViewDeviceActivity extends Activity {
             graph.setTitle(sensorName+"  " + device.getSensor(sensorName).getType().toString().toLowerCase());
             LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>();
             for (SensorData sensorData : device.getSensor(sensorName).getData()) {
-                java.util.Date time = new java.util.Date((long) sensorData.getTimestamp() * 1000);
-                series.appendData(new DataPoint(time, sensorData.getValue()), true, 100);
+                series.appendData(new DataPoint(sensorData.getDate(), sensorData.getValue()), true, 100);
                 graph.addSeries(series);
             }
             /*  The Toast here is not working very well...
@@ -163,6 +164,21 @@ public class ViewDeviceActivity extends Activity {
                 }
             });
             */
+            // TODO need to draw the X axis correctly
+            // Setting up the Graph axis
+            graph.getViewport().setScalable(true);
+            graph.getViewport().setScrollable(true);
+//            graph.getViewport().scrollToEnd();
+//            graph.getViewport().setMaxX(new Date().getTime());
+//            graph.getViewport().setMinX(new Date().getTime()-10000);
+            graph.getGridLabelRenderer().setHorizontalAxisTitle("Time");
+            graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(ViewDeviceActivity.this));
+//            graph.getGridLabelRenderer().setNumHorizontalLabels(2); // only 4 because of the space
+            //Calendar calendar = Calendar.getInstance();
+//            graph.getViewport().setMinX(new Date().getTime());
+//            graph.getViewport().setMaxX(new Date().getTime() - 1000*60*60*24);
+//            graph.getViewport().setXAxisBoundsManual(true);
+
             linLayout.addView(graph, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 200));
         }
 

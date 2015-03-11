@@ -1,5 +1,7 @@
 package org.trecet.nowhere.sensorino.model;
 
+import java.util.Date;
+
 /**
  * Created by pablof on 7/03/15.
  */
@@ -27,4 +29,13 @@ public class SensorData {
     public void setValue(float v) {
         this.v = v;
     }
+
+    public Date getDate() {
+        return new Date(t*1000);
+    }
+
+    public void setDate(Date date){
+        this.t = (int)date.getTime()/1000;
+    }
+
 }
