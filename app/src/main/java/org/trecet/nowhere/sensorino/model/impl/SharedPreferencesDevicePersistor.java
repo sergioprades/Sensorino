@@ -1,4 +1,4 @@
-package org.trecet.nowhere.sensorino.model;
+package org.trecet.nowhere.sensorino.model.impl;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -7,41 +7,29 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.trecet.nowhere.sensorino.model.Device;
+import org.trecet.nowhere.sensorino.model.DevicePersistor;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.List;
 
 
-public class Devices {
-
-    private static Devices singleton = null;
+public class SharedPreferencesDevicePersistor implements DevicePersistor    {
 
     Type listType = new TypeToken<ArrayList<Device>>() {}.getType();
     private ArrayList<Device> deviceList = new ArrayList<Device>();
 
-    private static Context context;
+    private SharedPreferences settings;
 
-    // Private Contructor
-    private Devices(){
+    public SharedPreferencesDevicePersistor(SharedPreferences preferences){
+
+        this.settings = preferences;
 
         load();
     }
 
-//    public static void setContext (Context ctx) {
-//        context = ctx;
-//    }
-
-    public static Devices getInstance(Context ctx){
-
-        context = ctx;
-
-        if(singleton == null) {
-            singleton = new Devices();
-        }
-
-        return singleton;
-
-    }
-
+    @Override
     public boolean persist (){
         //Set the values
         //Gson gson = new Gson();
@@ -50,20 +38,22 @@ public class Devices {
         Gson gson = new Gson();
         String jsonText = gson.toJson(deviceList);
         // Create the SharedPrefs editor handler
-        SharedPreferences settings = context.getSharedPreferences("Prefs", 0);
+
         SharedPreferences.Editor editor = settings.edit();
         // And write
         editor.putString("devices", jsonText);
         Log.d("Sensorino", "Persisting devices: "+jsonText);
-        editor.commit();
+        return editor.commit();
 
-        return true;
+        //FIXME Si el propio editor.commit devuelve un boolean, no enmascares su valor con un return
+        // true, te estás anulando la posibilidad de hacer un futuro control de errores en el commit
+        //return true;
     }
 
     private boolean load() {
         //Load from prefences
         Gson gson = new Gson();
-        SharedPreferences settings = context.getSharedPreferences("Prefs", 0);
+
         String jsonText = settings.getString("devices", "[]");
         Log.d("Sensorino", "Loading devices: "+jsonText);
         deviceList = gson.fromJson(jsonText, listType);
@@ -71,25 +61,39 @@ public class Devices {
         return true;
     }
 
-    public int add (Device device){
+    @Override
+    public boolean add (Device device){
         deviceList.add(device);
         Log.i("Sensorino", "Adding new device: " + device.getLocal_name());
 
         //Write to persistance
-        persist();
-        return 0;
+        return persist();
+
+        //FIXME devolvemos directamente el resultado de persist
+        //return 0;
     }
 
+    @Override
     public boolean remove (Device device) {
         this.deviceList.remove(device);
         Log.i("Sensorino", "Removing device: " + device.getLocal_name());
-        persist();
-        return true;
+        return persist();
+
+        //FIXME devolvemos directamente el resultado de persist
+        //return true;
     }
+
+    @Override
     public int size(){ return this.deviceList.size(); }
 
+    @Override
     public Device getDeviceByPosition(int position){
         return this.deviceList.get(position);
+    }
+
+    @Override
+    public List<Device> listDevices(){
+        return this.deviceList;
     }
 
 }

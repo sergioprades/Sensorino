@@ -1,8 +1,11 @@
-package org.trecet.nowhere.sensorino.model;
+package org.trecet.nowhere.sensorino.model.impl;
 
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
+
+import org.trecet.nowhere.sensorino.model.Device;
+import org.trecet.nowhere.sensorino.model.RemoteDevice;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,12 +16,12 @@ import app.akexorcist.bluetotohspp.library.BluetoothState;
 /**
  * Created by pablof on 8/03/15.
  */
-public class RemoteDeviceBluetooth extends RemoteDevice {
+public class RemoteDeviceControllerBluetooth extends RemoteDevice {
 
     private BluetoothSPP bt;
 
-    public RemoteDeviceBluetooth(Device device, Context context) {
-        super(device,context);
+    public RemoteDeviceControllerBluetooth(Device device, Context context) {
+        super(device, context);
         bt = new BluetoothSPP(context);
     }
 

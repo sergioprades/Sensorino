@@ -11,14 +11,15 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import org.trecet.nowhere.sensorino.R;
-import org.trecet.nowhere.sensorino.model.Devices;
+import org.trecet.nowhere.sensorino.model.DevicePersistorFactory;
+import org.trecet.nowhere.sensorino.model.DevicePersistor;
 
 import java.util.ArrayList;
 
 
 public class ListDevicesActivity extends Activity {
     ListView listView ;
-    Devices devices;
+    DevicePersistor devices;
 
 
     @Override
@@ -33,7 +34,7 @@ public class ListDevicesActivity extends Activity {
         super.onResume();
 
         // Get the device list
-        devices = Devices.getInstance(this);
+        devices = DevicePersistorFactory.getInstance().getDevicePersistor(this);
 
         // Get ListView object from xml
         listView = (ListView) findViewById(R.id.listDevices);

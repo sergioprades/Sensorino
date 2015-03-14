@@ -27,6 +27,15 @@ public class Device {
         this.remote_type = RemoteDeviceType.BLUETOOTH; // by default TODO remove later
     }
 
+    //FIXME Una vez un Sensor está creado tiene sentido que se le pueda cambiar el tipo?
+    //O planteado de otra forma ¿el tipo será un atributo no inherente al device desde su creación?
+    //Aquellos atributos que sean inmutables deben ser declarados con final
+    // private final RemoteDeviceType remote_type;
+    // Y los valores seteados en el constructor a través de parámetros
+    //     public Device(RemoteDeviceType remote_type)
+    //     this.remote_type = remote_type;
+    // los getters y setters no se crean todos por defecto sino cuando los necesitas.
+
     public String getLocal_name() {
         return local_name;
     }
@@ -71,11 +80,15 @@ public class Device {
         this.processor = processor;
     }
 
+    //FIXME ¿Esta relación con Devices por qué? Device es un objeto indepediente, esta lógica de
+    // negocio se debe hacer desde el sitio que lo necesite. No acoples los objetos si no lo
+    // necesitan
+
     // Persistence (provided by Devices
-    public void persist(Context context){
-        Devices devices = Devices.getInstance(context);
-        devices.persist();
-    }
+ //   public void persist(Context context){
+ //       Devices devices = Devices.getInstance(context);
+ //       devices.persist();
+ //   }
 
     // Sensor stuff
     public Set<String> getSensorNames() {

@@ -12,7 +12,8 @@ import android.widget.Toast;
 
 import org.trecet.nowhere.sensorino.R;
 import org.trecet.nowhere.sensorino.model.Device;
-import org.trecet.nowhere.sensorino.model.Devices;
+import org.trecet.nowhere.sensorino.model.DevicePersistorFactory;
+import org.trecet.nowhere.sensorino.model.DevicePersistor;
 import org.trecet.nowhere.sensorino.model.RemoteDeviceType;
 
 import java.util.ArrayList;
@@ -86,19 +87,26 @@ public class NewDeviceActivity extends Activity {
                         spinner_remote_type.getSelectedItem().toString());
 
                 // TODO we would need to check if one of the names already exists.
+                // FIXME Lo que te pongo dentro de Device, estos sets seguramente sean parte del constructor. Si siempre
+                // FIXME que se crea un Device tienen que setearse esas cosas (porque si no el objeto pierde integridad) entonces
+                // FIXME se debe forzar su inclusión mediante el constructor, así no hay manera de que se te olvide otra vez que tuvieras
+                // FIXME que crear un Device.
                 Device device = new Device ();
                 device.setRemote_name(remote_name);
                 device.setLocal_name(local_name);
                 // TODO we need to check the address is a valid BT address
+                // FIXME Referente al TODO, eso debería hacerlo el propio constructor o el set, y si no cumple devolver una excepción
                 device.setRemote_address(remote_address);
                 device.setFrequency(frequency);
                 device.setRemote_type(remote_type);
 
-                Devices devices = Devices.getInstance(NewDeviceActivity.this);
-                if (devices.add(device) == 0) {
+                DevicePersistor devices = DevicePersistorFactory.getInstance().getDevicePersistor(NewDeviceActivity.this);
+                //FIXME add era un int y remove un boolean. Lo unifico a boolean para hacer uso del valor retornado por persist
+                if (devices.add(device)) {
                     finish();
                     Toast.makeText(NewDeviceActivity.this, getString(R.string.toast_new_device_created), Toast.LENGTH_SHORT).show();
                 } else {
+                    //FIXME Este código antes era inalcanzable porque devolvías siempre un 0
                     Toast.makeText(NewDeviceActivity.this, getString(R.string.toast_new_device_error), Toast.LENGTH_SHORT).show();
 
                 }

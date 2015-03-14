@@ -1,4 +1,4 @@
-package org.trecet.nowhere.sensorino.model;
+package org.trecet.nowhere.sensorino.model.impl;
 
 import android.content.Context;
 import android.os.Handler;
@@ -7,21 +7,24 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.trecet.nowhere.sensorino.message.MessageType;
+import org.trecet.nowhere.sensorino.model.Device;
+import org.trecet.nowhere.sensorino.model.RemoteDevice;
 
 import java.util.Random;
 
 /**
  * Created by pablof on 8/03/15.
  */
-public class RemoteDeviceDummy extends RemoteDevice {
+public class RemoteDeviceControllerDummy extends RemoteDevice {
 
     MessageType lastMessage;
 
-    public RemoteDeviceDummy(Device device, Context context) {
-        super(device,context);
+    public RemoteDeviceControllerDummy(Device device, Context context) {
+
+        super(device, context);
     }
 
-    public void connect(final Connection connection) {
+    public void connect(final RemoteDevice.Connection connection) {
         Log.i("Sensorino", "Connecting to Dummy Device");
         // We're connected by default
         connection.onConnected();
@@ -41,7 +44,7 @@ public class RemoteDeviceDummy extends RemoteDevice {
         }
     }
 
-    public void onDataReceived(final Reception reception){
+    public void onDataReceived(final RemoteDevice.Reception reception){
         // TODO check this... I don't even know how it works!
         // (a normal thread thows an exception when updating the UI
         Handler mainHandler = new Handler(context.getMainLooper());

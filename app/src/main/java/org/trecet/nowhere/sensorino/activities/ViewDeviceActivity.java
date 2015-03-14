@@ -1,6 +1,5 @@
 package org.trecet.nowhere.sensorino.activities;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -9,7 +8,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,34 +15,23 @@ import android.widget.Toast;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.LineGraphSeries;
-import com.jjoe64.graphview.series.Series;
-import com.jjoe64.graphview.series.OnDataPointTapListener;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.trecet.nowhere.sensorino.R;
 import org.trecet.nowhere.sensorino.model.Device;
-import org.trecet.nowhere.sensorino.model.Devices;
+import org.trecet.nowhere.sensorino.model.DevicePersistorFactory;
+import org.trecet.nowhere.sensorino.model.DevicePersistor;
 import org.trecet.nowhere.sensorino.model.RemoteDevice;
-import org.trecet.nowhere.sensorino.model.RemoteDeviceBluetooth;
-import org.trecet.nowhere.sensorino.model.RemoteDeviceDummy;
-import org.trecet.nowhere.sensorino.model.Sensor;
+import org.trecet.nowhere.sensorino.model.RemoteDeviceHandler;
+import org.trecet.nowhere.sensorino.model.impl.RemoteDeviceControllerBluetooth;
+import org.trecet.nowhere.sensorino.model.impl.RemoteDeviceControllerDummy;
 import org.trecet.nowhere.sensorino.model.SensorData;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-
-import app.akexorcist.bluetotohspp.library.BluetoothSPP;
-import app.akexorcist.bluetotohspp.library.BluetoothState;
 
 
 public class ViewDeviceActivity extends Activity {
     Device device;
     RemoteDevice remoteDevice;
-    Devices devices;
+    DevicePersistor devices;
     int deviceID;
 
 
@@ -54,15 +41,15 @@ public class ViewDeviceActivity extends Activity {
         setContentView(R.layout.activity_sensorino_view_device);
 
         // Get the Device as a parameter
-        devices = Devices.getInstance(this);
+        devices = DevicePersistorFactory.getInstance().getDevicePersistor(this);
         deviceID = getIntent().getIntExtra("DeviceID",-1);
         device = devices.getDeviceByPosition(deviceID);
         switch (device.getRemote_type()) {
             case BLUETOOTH:
-                remoteDevice = new RemoteDeviceBluetooth(device,this);
+                remoteDevice = new RemoteDeviceControllerBluetooth(device,this);
                 break;
             case DUMMY:
-                remoteDevice = new RemoteDeviceDummy(device,this);
+                remoteDevice = new RemoteDeviceControllerDummy(device,this);
                 break;
             default:
                 finish();
@@ -88,10 +75,10 @@ public class ViewDeviceActivity extends Activity {
         remoteDevice.connect(new RemoteDevice.Connection() {
             @Override
             public void onConnected() {
-                remoteDevice.getDeviceInfo(new RemoteDevice.Command() {
+                RemoteDeviceHandler.getDeviceInfo(remoteDevice, new RemoteDevice.Command() {
                     @Override
                     public void onSuccess() {
-                        remoteDevice.getSensorInfo(new RemoteDevice.Command(){
+                        RemoteDeviceHandler.getSensorInfo(remoteDevice, new RemoteDevice.Command() {
                             @Override
                             public void onSuccess() {
                                 drawContent();
@@ -237,7 +224,7 @@ public class ViewDeviceActivity extends Activity {
         }
 
         if (id == R.id.action_get_sensor_data) {
-            remoteDevice.getSensorData(new RemoteDevice.Command() {
+            RemoteDeviceHandler.getSensorData(remoteDevice, new RemoteDevice.Command() {
                 @Override
                 public void onSuccess() {
                     drawContent();
