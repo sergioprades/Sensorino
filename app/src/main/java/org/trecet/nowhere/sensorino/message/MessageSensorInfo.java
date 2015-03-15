@@ -1,5 +1,7 @@
 package org.trecet.nowhere.sensorino.message;
 
+import org.trecet.nowhere.sensorino.model.Message;
+import org.trecet.nowhere.sensorino.model.MessageType;
 import org.trecet.nowhere.sensorino.model.Sensor;
 
 import java.util.Map;
@@ -8,8 +10,11 @@ import java.util.Set;
 /**
  * Created by pablof on 4/03/15.
  */
-public class MessageSensorInfo {
-    private MessageType type = MessageType.SENSOR_INFO;
+public class MessageSensorInfo extends Message{
+
+    public MessageSensorInfo(){
+        super(MessageType.SENSOR_INFO);
+    }
 
     private Map<String, String> data;
 

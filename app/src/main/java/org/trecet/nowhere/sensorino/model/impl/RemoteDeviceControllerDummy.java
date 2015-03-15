@@ -6,7 +6,7 @@ import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.trecet.nowhere.sensorino.message.MessageType;
+import org.trecet.nowhere.sensorino.model.MessageType;
 import org.trecet.nowhere.sensorino.model.Device;
 import org.trecet.nowhere.sensorino.model.RemoteDevice;
 

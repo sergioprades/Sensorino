@@ -3,8 +3,6 @@ package org.trecet.nowhere.sensorino.model;
 import android.content.Context;
 import android.util.Log;
 
-import com.google.gson.Gson;
-
 import org.trecet.nowhere.sensorino.message.MessageDeviceInfo;
 import org.trecet.nowhere.sensorino.message.MessageGetDeviceInfo;
 import org.trecet.nowhere.sensorino.message.MessageGetSensorData;
@@ -19,8 +17,6 @@ import org.trecet.nowhere.sensorino.model.RemoteDevice;
  */
 public class RemoteDeviceHandler {
 
-       private static Gson gson = new Gson();
-
         // TODO we probably need to get all the rest out of this class
         public static void getSensorData(final RemoteDevice remoteDevice, final RemoteDevice.Command command) {
             // Expected receive:
@@ -31,7 +27,8 @@ public class RemoteDeviceHandler {
                     // Do something when data incoming
                     Log.d("Sensorino", "Received: " + msg_receive);
                     // TODO check message is of the right type (exception?)
-                    MessageSensorData message = gson.fromJson(msg_receive, MessageSensorData.class);
+                    MessageSensorData message = MessageParserFactory.getInstance().getParser().unmarshal(MessageSensorData.class, msg_receive);
+
                     Log.i("Sensorino", "Received data: " + message.getData().toString());
 
                     // TODO Separate this... we may not want to insert it into the historical data
@@ -53,7 +50,8 @@ public class RemoteDeviceHandler {
 
             // Send { "type": "get_sensor_data" }
             MessageGetSensorData msg_send = new MessageGetSensorData();
-            String msg_send_string = gson.toJson(msg_send);
+            String msg_send_string = MessageParserFactory.getInstance().getParser().marshal(msg_send);
+
             Log.d("Sensorino", "Sent: " + msg_send_string);
             remoteDevice.send(msg_send_string);
         }
@@ -67,7 +65,7 @@ public class RemoteDeviceHandler {
                     // Do something when data incoming
                     Log.d("Sensorino", "Received: " + msg_receive);
                     //TODO check message is of the right type (exception?)
-                    MessageSensorInfo message = gson.fromJson(msg_receive, MessageSensorInfo.class);
+                    MessageSensorInfo message = MessageParserFactory.getInstance().getParser().unmarshal(MessageSensorInfo.class, msg_receive);
 
                     for (String name : message.getSensorNames()) {
                         if (!remoteDevice.getDevice().getSensorNames().contains(name)) {
@@ -88,7 +86,7 @@ public class RemoteDeviceHandler {
 
             // Send { "type": "get_sensor_info" }
             MessageGetSensorInfo msg_send = new MessageGetSensorInfo();
-            String msg_send_string = gson.toJson(msg_send);
+            String msg_send_string = MessageParserFactory.getInstance().getParser().marshal(msg_send);
             Log.d("Sensorino", "Sent: " + msg_send_string);
             remoteDevice.send(msg_send_string);
         }
@@ -103,7 +101,7 @@ public class RemoteDeviceHandler {
                     // Do something when data incoming
                     Log.d("Sensorino", "Received: " + msg_receive);
                     // TODO check message is of the right type (exception?)
-                    MessageDeviceInfo message = gson.fromJson(msg_receive, MessageDeviceInfo.class);
+                    MessageDeviceInfo message = MessageParserFactory.getInstance().getParser().unmarshal(MessageDeviceInfo.class, msg_receive);
                     // TODO make the getData private here as well if possible (like MessageSensorInfo)
                     remoteDevice.setUptime(Integer.parseInt(message.getData().get("uptime_s")));
 
@@ -113,7 +111,7 @@ public class RemoteDeviceHandler {
 
             // Send { "type": "get_device_info" }
             MessageGetDeviceInfo msg_send = new MessageGetDeviceInfo();
-            String msg_send_string = gson.toJson(msg_send);
+            String msg_send_string = MessageParserFactory.getInstance().getParser().marshal(msg_send);
             Log.d("Sensorino", "Sent: " + msg_send_string);
             remoteDevice.send(msg_send_string);
         }

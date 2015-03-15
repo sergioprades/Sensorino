@@ -1,4 +1,4 @@
-package org.trecet.nowhere.sensorino.message;
+package org.trecet.nowhere.sensorino.model;
 
 /**
  * Created by edoras on 3/2/15.

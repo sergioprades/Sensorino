@@ -39,7 +39,7 @@ public class Sensor {
     public Sensor(String name, SensorType type) {
         this.name = name;
         this.type = type;
-        this.data = new ArrayList<>();
+        this.data = new ArrayList<SensorData>();
     }
 
     public String getName() {

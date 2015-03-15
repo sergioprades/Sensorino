@@ -21,7 +21,7 @@ public class Device {
         this.remote_address = "";
         this.processor = "";
         this.frequency = 0;
-        this.sensors = new HashMap<>();
+        this.sensors = new HashMap<String, Sensor>();
         this.remote_name = "";
         this.local_name = "NULL";
         this.remote_type = RemoteDeviceType.BLUETOOTH; // by default TODO remove later
